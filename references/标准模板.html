@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 标题：专家课 · <群名> -->
+<title>专家课 · 标准模板</title>
+<style>
+  /* ===== Swiss 锚点 token（frontend-design · 已锁定，全程只换 --accent 一种强调色） ===== */
+  :root{
+    --bg:#f5f5f7; --paper:#ffffff; --ink:#1d1d1f; --muted:#6e6e73;
+    --line:#d2d2d7; --accent:#0071e3; --accent-2:#42a5f5; --accent-soft:#e8f1fd;
+    --quote-bg:#f0f1f5; --warn:#b25000; --warn-bg:#fff7ed; --ok:#007a3d;
+    --radius:18px; --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.05);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Segoe UI",sans-serif;
+    /* Butterick + ui-ux-pro-max：正文 17px / 行高 1.78 / 不顶边 */
+    font-size:17px; line-height:1.78; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  /* 阅读进度条 */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));z-index:50;transition:width .1s}
+  /* 顶栏 */
+  .topbar{position:sticky;top:0;z-index:40;background:rgba(245,245,247,.85);backdrop-filter:saturate(180%) blur(10px);
+    border-bottom:1px solid var(--line);padding:11px 20px;display:flex;align-items:center;gap:10px}
+  .topbar .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .topbar b{font-size:14.5px;letter-spacing:.3px}
+  .topbar span{color:var(--muted);font-size:12.5px;margin-left:auto}
+
+  /* 两栏：主栏 ≤720px + 右侧粘性目录（scroll-spy） */
+  .layout{max-width:1040px;margin:0 auto;padding:30px 22px 90px;display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:42px}
+  .main{max-width:720px}
+
+  /* HERO：结论先行，一句话讲清这篇讲什么 */
+  .hero{background:linear-gradient(135deg,#0071e3,#42a5f5 60%,#0099f7);color:#fff;border-radius:20px;
+    padding:32px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-50px;top:-50px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.12)}
+  .hero .kicker{font-size:12px;opacity:.9;letter-spacing:3px;text-transform:uppercase}
+  .hero h1{margin:10px 0 14px;font-size:29px;line-height:1.32;font-weight:800}
+  .hero .oneliner{font-size:16px;opacity:.97;max-width:600px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .meta .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:5px 11px;border-radius:999px;font-size:12.5px}
+
+  /* 右栏目录 */
+  .toc{position:sticky;top:74px;align-self:start}
+  .toc .lab{font-size:11.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+  .toc a{display:block;color:var(--muted);text-decoration:none;font-size:13.5px;padding:6px 10px;border-left:2px solid var(--line);transition:.15s}
+  .toc a:hover{color:var(--ink)}
+  .toc a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+  section{margin:38px 0;scroll-margin-top:70px}
+  .sec-head{display:flex;align-items:center;gap:11px;margin:0 0 16px}
+  .sec-head .no{width:32px;height:32px;flex:0 0 32px;border-radius:9px;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:14px}
+  .sec-head h2{margin:0;font-size:21px;font-weight:800;letter-spacing:.2px}
+
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);margin:14px 0}
+  .card h3{margin:0 0 10px;font-size:18px;font-weight:700}
+  .card p{margin:.55em 0}
+
+  .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px}
+  .person{background:var(--accent-soft);border:1px solid #d6e4ff;border-radius:11px;padding:11px 13px}
+  .person b{color:var(--accent)}
+  .person small{display:block;color:var(--muted);margin-top:3px;font-size:13px}
+
+  blockquote{margin:14px 0;padding:13px 17px;border-left:4px solid var(--accent);background:var(--quote-bg);
+    border-radius:0 12px 12px 0;color:#334155}
+  blockquote .who{display:block;margin-top:7px;font-size:12.5px;color:var(--muted)}
+  /* 关键词高亮：渐变底色（NNGroup 扫描式阅读） */
+  .hl{background:linear-gradient(transparent 62%,#d6e8ff 62%);padding:0 2px;font-weight:600}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;background:var(--paper);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:var(--accent-soft);color:#0066cc;font-weight:700}
+  tr:nth-child(even) td{background:#f5f5f7}
+
+  /* 必记清单 */
+  .remember{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:11px}
+  .rm{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);font-size:15px}
+  .rm b{color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin-right:4px}
+
+  /* 踩坑对照 */
+  .pit{background:var(--warn-bg);border:1px solid #fcd9b6;border-radius:12px;padding:12px 16px;margin:10px 0;border-left:4px solid var(--warn)}
+  .pit .bad{color:var(--warn);font-weight:700}
+  .pit .good{color:var(--ok);font-weight:700}
+
+  /* 行动清单 */
+  .act{display:flex;gap:13px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:10px 0;box-shadow:var(--shadow)}
+  .act .box{flex:0 0 26px;width:26px;height:26px;border-radius:8px;border:2px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-weight:800;font-size:13px}
+  .act .body b{display:block}
+  .act .body small{color:var(--muted);font-size:13.5px}
+
+  .closing{background:linear-gradient(135deg,#1d1d1f,#000000);color:#e2e8f0;border-radius:18px;padding:24px 26px;margin-top:34px}
+  .closing p{margin:.5em 0}
+  .closing .big{color:#fff;font-size:18px;font-weight:800}
+  .ref{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
+  .ref b{color:var(--ink)}
+
+  /* 移动端：≤860px 收单栏、隐藏右栏 TOC（ui-ux-pro-max：无横向滚动） */
+  @media(max-width:860px){
+    .layout{grid-template-columns:1fr;gap:0}
+    .toc{display:none}
+    .hero h1{font-size:24px}.main{max-width:100%}
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- ============ 顶栏：填群名 + 人设 + 时间范围 ============ -->
+<div class="topbar">
+  <span class="dot"></span><b>专家课 · 群名占位</b>
+  <span>人设占位 · 时间范围占位 · 约 N 分钟阅读</span>
+</div>
+
+<div class="layout">
+  <div class="main">
+
+    <!-- ============ HERO：一句话讲清这篇讲什么 ============ -->
+    <div class="hero">
+      <div class="kicker">群聊 → 专家课 · 精华成品</div>
+      <h1>本群核心结论占位（一句话）</h1>
+      <div class="oneliner">用大白话重述：这篇能让你照着做的最关键一句。</div>
+      <div class="meta">
+        <span class="chip">群名占位</span>
+        <span class="chip">N 条有效发言</span>
+        <span class="chip">已剔除寒暄 / 表情 / 水群</span>
+      </div>
+    </div>
+
+    <!-- ============ 正文：每个 section 一个主题，id 与右栏 TOC 锚点对应 ============ -->
+    <section id="t1">
+      <div class="sec-head"><div class="no">🎓</div><h2>你的老师是谁</h2></div>
+      <div class="card">
+        <p>领域专家人设介绍，<span class="hl">关键特征用高亮</span>。</p>
+        <div class="people"><!-- 群内核心人物卡：<div class="person"><b>名</b><small>角色</small></div> --></div>
+      </div>
+    </section>
+
+    <section id="t2">
+      <div class="sec-head"><div class="no">📘</div><h2>核心方法 / 工作流</h2></div>
+      <div class="card">
+        <p>结论先行 + 列表化。引用用 blockquote：</p>
+        <blockquote>原话摘录<span class="who">— 发言人</span></blockquote>
+      </div>
+    </section>
+
+    <section id="t3">
+      <div class="sec-head"><div class="no">⚠️</div><h2>踩坑与避坑</h2></div>
+      <div class="pit"><span class="bad">误区：</span>……<br><span class="good">正解：</span>……</div>
+    </section>
+
+    <section id="t4">
+      <div class="sec-head"><div class="no">✅</div><h2>必记清单</h2></div>
+      <div class="remember"><!-- <div class="rm"><b>A1</b>要点</div> --></div>
+    </section>
+
+    <section id="t5">
+      <div class="sec-head"><div class="no">🚀</div><h2>行动清单</h2></div>
+      <div class="act"><div class="box">0</div><div class="body"><b>第一步</b><small>具体动作</small></div></div>
+    </section>
+
+    <!-- ============ 收尾 ============ -->
+    <div class="closing">
+      <p class="big">一句话带走</p>
+      <p>把全篇浓缩成读者能记住的一句。</p>
+    </div>
+
+    <div class="ref">
+      <b>排版依据</b>：Butterick 实用排版（正文 17px / 行高 1.78 / 行宽 45–90 字符）+ NNGroup 扫描式阅读（关键词高亮 / 结论先行 / 列表）+ frontend-design「Swiss」锚点 + ui-ux-pro-max（对比度 ≥4.5:1 / 8px 栅格 / 移动端无横滑）。引擎：baoyu-markdown-to-html。
+    </div>
+  </div>
+
+  <!-- ============ 右栏目录：a 的 href 与上面 section 的 id 一一对应 ============ -->
+  <nav class="toc">
+    <div class="lab">目录</div>
+    <a href="#t1">你的老师是谁</a>
+    <a href="#t2">核心方法</a>
+    <a href="#t3">踩坑与避坑</a>
+    <a href="#t4">必记清单</a>
+    <a href="#t5">行动清单</a>
+  </nav>
+</div>
+
+<!-- ============ 阅读辅助 JS：进度条 + scroll-spy ============ -->
+<script>
+  var bar=document.getElementById('progress');
+  function onScroll(){var h=document.documentElement, st=h.scrollTop||document.body.scrollTop, sh=(h.scrollHeight-h.clientHeight)||1; bar.style.width=(st/sh*100)+'%';}
+  document.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  var links=[].slice.call(document.querySelectorAll('.toc a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var id='#'+e.target.id; links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')===id);});}});},{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(function(s){if(s)io.observe(s);});
+</script>
+</body>
+</html>
